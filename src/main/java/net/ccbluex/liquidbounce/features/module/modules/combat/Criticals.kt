@@ -137,8 +137,6 @@ class Criticals : Module() {
                 "lowjump" -> mc.thePlayer.motionY = 0.3425
                 "redeskylowhop" -> mc.thePlayer.motionY = 0.35
             }
-            if(debugValue.get())
-                chat("CRIT")
             msTimer.reset()
         }
     }
@@ -169,6 +167,11 @@ class Criticals : Module() {
                             rsCritChange = 0
                     }
                 }
+            }
+        }
+        if(packet is S0BPacketAnimation&&debugValue.get()){
+            if(packet.animationType==4&&packet.entityID==target){
+                chat("CRIT")
             }
         }
     }
