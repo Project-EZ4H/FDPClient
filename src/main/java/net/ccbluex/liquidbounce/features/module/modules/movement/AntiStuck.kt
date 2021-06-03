@@ -61,7 +61,7 @@ class AntiStuck : Module() {
                 stuck=true
                 LiquidBounce.hud.addNotification(Notification(name,"Trying to unstuck you", NotifyType.INFO,1500))
             }
-            if(timer.hasTimePassed(2000) && reduceTimer.hasTimePassed(500) && flagTime>0){
+            if(timer.hasTimePassed(1500) && reduceTimer.hasTimePassed(500) && flagTime>0){
                 flagTime -= 1;
                 reduceTimer.reset()
             }
@@ -74,6 +74,10 @@ class AntiStuck : Module() {
 
         if(packet is S08PacketPlayerPosLook){
             flagTime++
+            reduceTimer.reset()
+            if(!stuck) {
+                timer.reset()
+            }
         }
         if(stuck&&packet is C03PacketPlayer){
             event.cancelEvent()
