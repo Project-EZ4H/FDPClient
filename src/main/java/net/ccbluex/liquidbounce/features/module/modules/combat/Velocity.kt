@@ -205,7 +205,7 @@ class Velocity : Module() {
                         return
 
 //                    chat("MOTX=${packet.motionX}, MOTZ=${packet.motionZ}")
-                    if(packet.motionX<500&&packet.motionY<500)
+                    if(packet.motionY<325 && (packet.motionX==0 && packet.motionZ==0))
                         return
 
                     mc.netHandler.addToSendQueue(C03PacketPlayer.C04PacketPlayerPosition(mc.thePlayer.posX,mc.thePlayer.posY-phaseHeightValue.get(),mc.thePlayer.posZ,false))
