@@ -12,13 +12,13 @@ class RedeSkyGround : SpeedMode("RedeSkyGround") {
         if(MovementUtils.isMoving()){
             if(stage){
                 mc.timer.timerSpeed=1.81F
-                if(timer.hasTimePassed(350)){
+                if(timer.hasTimePassed(250)){
                     timer.reset()
                     stage=!stage
                 }
             }else{
                 mc.timer.timerSpeed=0.92F
-                if(timer.hasTimePassed(450)){
+                if(timer.hasTimePassed(350)){
                     timer.reset()
                     stage=!stage
                 }
