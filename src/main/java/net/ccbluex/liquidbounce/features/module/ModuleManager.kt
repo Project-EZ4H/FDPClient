@@ -70,6 +70,7 @@ class ModuleManager : Listenable {
             FastUse::class.java,
             Teleport::class.java,
             ItemESP::class.java,
+            PointerESP::class.java,
             StorageESP::class.java,
             Projectiles::class.java,
             BetterFPS::class.java,
