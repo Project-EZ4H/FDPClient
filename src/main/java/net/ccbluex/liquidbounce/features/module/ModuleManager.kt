@@ -56,6 +56,7 @@ class ModuleManager : Listenable {
             SafeWalk::class.java,
             Strafe::class.java,
             Sprint::class.java,
+            Sneak::class.java,
             Teams::class.java,
             NoRotateSet::class.java,
             AntiBot::class.java,
