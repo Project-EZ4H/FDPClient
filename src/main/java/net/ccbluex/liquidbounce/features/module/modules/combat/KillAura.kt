@@ -417,6 +417,10 @@ class KillAura : Module() {
             }
         }
     }
+      /**
+     * Render event
+     */
+    @EventTarget
     fun onRender3D(event: Render3DEvent) {
         if (cancelRun) {
             target = null
