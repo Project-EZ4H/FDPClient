@@ -64,7 +64,7 @@ public class ClickGUI extends Module {
                 mc.displayGuiScreen(LiquidBounce.crink);
                 break;
             case "White":
-                mc.displayGuiScreen(new me.kiras.aimwhere.ui.guis.screens.clickgui.ClickGui());
+                mc.displayGuiScreen(new net.ccbluex.liquidbounce.ui.guis.screens.clickgui.ClickGui());
                 break;
     }
 
