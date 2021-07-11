@@ -15,6 +15,7 @@ import net.ccbluex.liquidbounce.ui.client.clickgui.ClickGui;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.LiquidBounceStyle;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.NullStyle;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.SlowlyStyle;
+import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.BlackStyle;
 import net.ccbluex.liquidbounce.utils.render.ColorUtils;
 import net.ccbluex.liquidbounce.value.BoolValue;
 import net.ccbluex.liquidbounce.value.FloatValue;
@@ -29,15 +30,16 @@ import java.awt.*;
 // TODO: Rewrite clickgui
 @ModuleInfo(name = "ClickGUI", description = "Opens the ClickGUI.", category = ModuleCategory.CLIENT, keyBind = Keyboard.KEY_RSHIFT, canEnable = false)
 public class ClickGUI extends Module {
-    private final ListValue styleValue = new ListValue("Style", new String[] {"LiquidBounce", "Null", "Slowly"}, "Slowly") {
+    private final ListValue styleValue = new ListValue("Style", new String[] {"LiquidBounce", "Null", "BlackStyle", "Slowly"}, "Slowly") {
         @Override
         protected void onChanged(final String oldValue, final String newValue) {
             updateStyle();
         }
     };
-
+    public final ListValue modeValue = new ListValue("Mode", new String[]{"LiquidBounce","FDP","FDPClient","White"}, "FDP");
     public final FloatValue scaleValue = new FloatValue("Scale", 1F, 0.7F, 2F);
     public final IntegerValue maxElementsValue = new IntegerValue("MaxElements", 15, 1, 20);
+    public static final ColorValue colorValue = new ColorValue("Color", -8350465);
 
     private static final IntegerValue colorRedValue = new IntegerValue("R", 0, 0, 255);
     private static final IntegerValue colorGreenValue = new IntegerValue("G", 160, 0, 255);
@@ -51,8 +53,19 @@ public class ClickGUI extends Module {
     @Override
     public void onEnable() {
         updateStyle();
-
-        mc.displayGuiScreen(LiquidBounce.clickGui);
+        switch(modeValue.get()) {
+            case "LiquidBounce":
+                mc.displayGuiScreen(LiquidBounce.clickGui);
+                break;
+            case "FDP":
+                mc.displayGuiScreen(new LightClickGUI());
+                break;
+            case "FDPClient":
+                mc.displayGuiScreen(LiquidBounce.crink);
+                break;
+            case "White":
+                mc.displayGuiScreen(new me.kiras.aimwhere.ui.guis.screens.clickgui.ClickGui());
+                break;
     }
 
     private void updateStyle() {
@@ -63,6 +76,8 @@ public class ClickGUI extends Module {
             case "null":
                 LiquidBounce.clickGui.style = new NullStyle();
                 break;
+            case "BlackStyle":
+                LiquidBounce.clickGui.style = new BlackStyle();
             case "slowly":
                 LiquidBounce.clickGui.style = new SlowlyStyle();
                 break;
