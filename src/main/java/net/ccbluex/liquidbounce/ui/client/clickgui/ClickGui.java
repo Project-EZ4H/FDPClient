@@ -14,11 +14,14 @@ import net.ccbluex.liquidbounce.ui.client.clickgui.elements.Element;
 import net.ccbluex.liquidbounce.ui.client.clickgui.elements.ModuleElement;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.Style;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.SlowlyStyle;
+import net.ccbluex.liquidbounce.ui.client.hud.designer.GuiHudDesigner;
 import net.ccbluex.liquidbounce.ui.font.AWTFontRenderer;
+import net.ccbluex.liquidbounce.utils.EntityUtils;
 import net.ccbluex.liquidbounce.utils.render.RenderUtils;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.util.ResourceLocation;
 import org.lwjgl.input.Mouse;
 
 import java.io.IOException;
@@ -29,6 +32,7 @@ import java.util.Objects;
 public class ClickGui extends GuiScreen {
 
     public final List<Panel> panels = new ArrayList<>();
+    private final ResourceLocation hudIcon = new ResourceLocation("FDP/custom_hud_icon.png");
     public Style style = new SlowlyStyle();
     private Panel clickedPanel;
     private int mouseX;
@@ -52,10 +56,151 @@ public class ClickGui extends GuiScreen {
 
             yPos += 20;
         }
+
+        yPos += 20;
+
+        panels.add(new Panel("Targets", 100, yPos, width, height, false) {
+
+            @Override
+            public void setupItems() {
+                getElements().add(new ButtonElement("Players") {
+
+                    @Override
+                    public void createButton(String displayName) {
+                        color = EntityUtils.targetPlayer ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        super.createButton(displayName);
+                    }
+
+                    @Override
+                    public String getDisplayName() {
+                        displayName = "Players";
+                        color = EntityUtils.targetPlayer ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        return super.getDisplayName();
+                    }
+
+                    @Override
+                    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+                        if (mouseButton == 0 && isHovering(mouseX, mouseY) && isVisible()) {
+                            EntityUtils.targetPlayer = !EntityUtils.targetPlayer;
+                            displayName = "Players";
+                            color = EntityUtils.targetPlayer ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                            mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                        }
+                    }
+                });
+
+                getElements().add(new ButtonElement("Mobs") {
+
+                    @Override
+                    public void createButton(String displayName) {
+                        color = EntityUtils.targetMobs ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        super.createButton(displayName);
+                    }
+
+                    @Override
+                    public String getDisplayName() {
+                        displayName = "Mobs";
+                        color = EntityUtils.targetMobs ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        return super.getDisplayName();
+                    }
+
+                    @Override
+                    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+                        if (mouseButton == 0 && isHovering(mouseX, mouseY) && isVisible()) {
+                            EntityUtils.targetMobs = !EntityUtils.targetMobs;
+                            displayName = "Mobs";
+                            color = EntityUtils.targetMobs ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                            mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                        }
+                    }
+                });
+
+                getElements().add(new ButtonElement("Animals") {
+
+                    @Override
+                    public void createButton(String displayName) {
+                        color = EntityUtils.targetAnimals ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        super.createButton(displayName);
+                    }
+
+                    @Override
+                    public String getDisplayName() {
+                        displayName = "Animals";
+                        color = EntityUtils.targetAnimals ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        return super.getDisplayName();
+                    }
+
+                    @Override
+                    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+                        if (mouseButton == 0 && isHovering(mouseX, mouseY) && isVisible()) {
+                            EntityUtils.targetAnimals = !EntityUtils.targetAnimals;
+                            displayName = "Animals";
+                            color = EntityUtils.targetAnimals ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                            mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                        }
+                    }
+                });
+
+                getElements().add(new ButtonElement("Invisible") {
+
+                    @Override
+                    public void createButton(String displayName) {
+                        color = EntityUtils.targetInvisible ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        super.createButton(displayName);
+                    }
+
+                    @Override
+                    public String getDisplayName() {
+                        displayName = "Invisible";
+                        color = EntityUtils.targetInvisible ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        return super.getDisplayName();
+                    }
+
+                    @Override
+                    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+                        if (mouseButton == 0 && isHovering(mouseX, mouseY) && isVisible()) {
+                            EntityUtils.targetInvisible = !EntityUtils.targetInvisible;
+                            displayName = "Invisible";
+                            color = EntityUtils.targetInvisible ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                            mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                        }
+                    }
+                });
+
+                getElements().add(new ButtonElement("Dead") {
+
+                    @Override
+                    public void createButton(String displayName) {
+                        color = EntityUtils.targetDead ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        super.createButton(displayName);
+                    }
+
+                    @Override
+                    public String getDisplayName() {
+                        displayName = "Dead";
+                        color = EntityUtils.targetDead ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                        return super.getDisplayName();
+                    }
+
+                    @Override
+                    public void mouseClicked(int mouseX, int mouseY, int mouseButton) {
+                        if (mouseButton == 0 && isHovering(mouseX, mouseY) && isVisible()) {
+                            EntityUtils.targetDead = !EntityUtils.targetDead;
+                            displayName = "Dead";
+                            color = EntityUtils.targetDead ? ClickGUI.generateColor().getRGB() : Integer.MAX_VALUE;
+                            mc.getSoundHandler().playSound(PositionedSoundRecord.create(new ResourceLocation("gui.button.press"), 1.0F));
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
     public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        if (Mouse.isButtonDown(0) && mouseX >= 5 && mouseX <= 50 && mouseY <= height - 5 && mouseY >= height - 50)
+            mc.displayGuiScreen(new GuiHudDesigner());
+
         // Enable DisplayList optimization
         AWTFontRenderer.Companion.setAssumeNonVolatile(true);
 
@@ -68,6 +213,8 @@ public class ClickGui extends GuiScreen {
         this.mouseY = mouseY;
 
         drawDefaultBackground();
+
+        RenderUtils.drawImage(hudIcon, 9, height - 41, 32, 32);
 
         GlStateManager.scale(scale, scale, scale);
 
