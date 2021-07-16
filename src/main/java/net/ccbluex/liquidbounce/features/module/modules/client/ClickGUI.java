@@ -16,6 +16,7 @@ import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.BlackStyle;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.LiquidBounceStyle;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.NullStyle;
 import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.SlowlyStyle;
+import net.ccbluex.liquidbounce.ui.client.clickgui.style.styles.BlackStyle;
 import net.ccbluex.liquidbounce.utils.render.ColorUtils;
 import net.ccbluex.liquidbounce.value.BoolValue;
 import net.ccbluex.liquidbounce.value.FloatValue;
