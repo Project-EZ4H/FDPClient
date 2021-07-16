@@ -6,7 +6,7 @@
 package net.ccbluex.liquidbounce.features.module.modules.render
 
 import net.ccbluex.liquidbounce.LiquidBounce
-import net.ccbluex.liquidbounce.event.impl.EventModelUpdate
+import net.ccbluex.liquidbounce.utils.entity.impl.EventModelUpdate
 import net.ccbluex.liquidbounce.event.Render3DEvent
 import net.ccbluex.liquidbounce.features.module.ModuleCategory
 import net.ccbluex.liquidbounce.features.module.Module
