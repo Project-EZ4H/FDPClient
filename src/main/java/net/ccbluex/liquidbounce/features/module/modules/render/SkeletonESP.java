@@ -16,7 +16,7 @@ extends Module {
     private final String SMOOTH = "Smooth";
 
     public SkeletonESP() {
-        super("SkeletonESP", Category.Visuals);
+        super("SkeletonESP", Category.render);
         Main.instance.setmgr.rSetting(new Setting("Skeleton Width", this, 1.0, 0.1, 15.0, false));
         Main.instance.setmgr.rSetting(new Setting("Skeleton Smooth", this, true));
     }
