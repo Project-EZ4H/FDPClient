@@ -14,7 +14,7 @@ extends Module {
     public boolean onFriend = true;
 
     public MCF() {
-        super("MCF", Category.Player);
+        super("MCF", Category.World);
     }
 
     @Override
