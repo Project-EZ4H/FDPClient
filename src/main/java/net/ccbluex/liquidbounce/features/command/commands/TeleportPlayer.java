@@ -1,4 +1,4 @@
-package net.ccbluex.liquidbounce.features.command.commands
+package net.ccbluex.liquidbounce.features.command.commands;
 
 import java.util.Iterator;
 
@@ -7,7 +7,7 @@ import net.minecraft.entity.Entity;
 import net.minecraft.network.play.client.C03PacketPlayer;
 import net.ccbluex.liquidbounce.features.command.CommandManager;
 import net.ccbluex.liquidbounce.features.command.commands;
-import net.ccbluex.liquidbounce.utils.render.RenderUtils.java 
+import import net.ccbluex.liquidbounce.utils.ClientUtils.java;
 
 @Com(names = { "tp", "teleportplayer" })
 public class TeleportPlayer extends Command
