@@ -20,8 +20,10 @@ import net.ccbluex.liquidbounce.utils.render.AnimationUtils
 import net.ccbluex.liquidbounce.utils.render.ColorUtils
 import net.ccbluex.liquidbounce.utils.render.RenderUtils
 import net.ccbluex.liquidbounce.value.*
+import net.minecraft.client.gui.Gui
 import net.minecraft.client.renderer.GlStateManager
 import java.awt.Color
+import kotlin.math.abs
 
 /**
  * CustomHUD Arraylist element
@@ -31,7 +33,8 @@ import java.awt.Color
 @ElementInfo(name = "Arraylist", single = true)
 class Arraylist(x: Double = 1.0, y: Double = 2.0, scale: Float = 1F,
                 side: Side = Side(Horizontal.RIGHT, Vertical.UP)) : Element(x, y, scale, side) {
-
+  
+    private val nameBreakValue = BoolValue("NameBreak", true)
     private val colorModeValue = ListValue("Text-Color", arrayOf("Custom", "Random", "Rainbow", "AnotherRainbow", "OtherRainbow", "SkyRainbow"), "SkyRainbow")
     private val colorRedValue = IntegerValue("Text-R", 0, 0, 255)
     private val colorGreenValue = IntegerValue("Text-G", 111, 0, 255)
@@ -121,11 +124,22 @@ class Arraylist(x: Double = 1.0, y: Double = 2.0, scale: Float = 1F,
         when (side.horizontal) {
             Horizontal.RIGHT, Horizontal.MIDDLE -> {
                 modules.forEachIndexed { index, module ->
+                 val translate = module.translate
+                 var displayString = if (!tags.get())
+                     module.getBreakName(nameBreakValue.get())
+                 else if (tagsArrayColor.get())
+                     module.colorlessTagName(nameBreakValue.get())
+                 else module.tagName(nameBreakValue.get())
 
+                 if (upperCaseValue.get())
+                     displayString = displayString.toUpperCase()
+                        
                     val xPos = -module.slide - 2
                     val yPos = (if (side.vertical == Vertical.DOWN) -textSpacer else textSpacer) *
                             if (side.vertical == Vertical.DOWN) index + 1 else index
                     val moduleColor = Color.getHSBColor(module.hue, saturation, brightness).rgb
+                   module.translate.interpolate(xPos, yPos, animationSpeedValue.get().toDouble())
+                    counter[0] = counter[0] + 1
 
                     val rectX=xPos - if (rectMode.equals("right", true)) 5 else 2
                     RenderUtils.drawRect(
@@ -193,6 +207,22 @@ class Arraylist(x: Double = 1.0, y: Double = 2.0, scale: Float = 1F,
                                         RenderUtils.drawRect(xPos - 3, yPos + textHeight, 0.0F, yPos + textHeight + 1,
                                             rectColor)
                                     }
+                                    if (module != modules[0]) {
+                                        var displayStrings = if (!tags.get())
+                                            modules[index - 1].getBreakName(nameBreakValue.get())
+                                        else if (tagsArrayColor.get())
+                                            modules[index - 1].colorlessTagName(nameBreakValue.get())
+                                        else modules[index - 1].tagName(nameBreakValue.get())
+
+                                        if (upperCaseValue.get())
+                                            displayStrings = displayStrings.toUpperCase()
+
+                                        RenderUtils.drawRect(xPos - outLineRectWidth.get() - (fontRenderer.getStringWidth(displayStrings) - fontRenderer.getStringWidth(displayString)), module.translate.y, xPos - outLineRectWidth.get() + 1, module.translate.y + 1,
+                                            rectColor)
+                                        if (module == modules[modules.size - 1]) {
+                                            RenderUtils.drawRect(xPos - outLineRectWidth.get(), yPos + textHeight, 0.0F, yPos + textHeight + 1,
+                                                rectColor)
+                                    }
                                 }
                             }
                         }
@@ -202,6 +232,17 @@ class Arraylist(x: Double = 1.0, y: Double = 2.0, scale: Float = 1F,
 
             Horizontal.LEFT -> {
                 modules.forEachIndexed { index, module ->
+                    val translate = module.translate
+                    var displayString = if (!tags.get())
+                        module.getBreakName(nameBreakValue.get())
+                    else if (tagsArrayColor.get())
+                        module.colorlessTagName(nameBreakValue.get())
+                    else module.tagName(nameBreakValue.get())
+                    
+                    if (upperCaseValue.get())
+                        displayString = displayString.toUpperCase()
+                          
+                    val width = fontRenderer.getStringWidth(displayString)    
                     val xPos = -(module.width - module.slide) + if (rectMode.equals("left", true)) 5 else 2
                     val yPos = (if (side.vertical == Vertical.DOWN) -textSpacer else textSpacer) *
                             if (side.vertical == Vertical.DOWN) index + 1 else index
