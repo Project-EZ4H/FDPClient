@@ -77,12 +77,19 @@ class KillAura : Module() {
 
     // Range
     val rangeValue = FloatValue("Range", 3.7f, 1f, 8f)
+    private val blockRangeValue = FloatValue("BlockRange", 6.0F, 1.0F, 8.0F)
     private val throughWallsRangeValue = FloatValue("ThroughWallsRange", 1.5f, 0f, 8f)
+    private val switchDelayValue = IntegerValue("SwitchDelay", 1, 0, 1000)
+    private val circleRadiusValue = FloatValue("CircleRadius", 1.0F,0.5F, 3.0F)
     private val rangeSprintReducementValue = FloatValue("RangeSprintReducement", 0f, 0f, 0.4f)
 
     // Modes
     private val priorityValue = ListValue("Priority", arrayOf("Health", "Distance", "Direction", "LivingTime"), "Distance")
     private val targetModeValue = ListValue("TargetMode", arrayOf("Single", "Switch", "Multi"), "Single")
+    private val blockModeValue = ListValue("Block", arrayOf("Packet","Normal"), "Normal")
+    private val rotationModeValue = ListValue("Rotation", arrayOf("Normal","AntiCheat","BackTrace"), "Normal")
+    private val markModeValue = ListValue("Mark", arrayOf("Jello","Circle","Plat","Box","Off"), "Jello")
+    private val boundingBoxModeValue = ListValue("LockLocation", arrayOf("Head","Auto"), "Auto")
 
     // Bypass
     private val swingValue = ListValue("Swing", arrayOf("Normal", "Packet", "None"), "Normal")
@@ -94,6 +101,8 @@ class KillAura : Module() {
     private val autoBlockPacketValue = ListValue("AutoBlockPacket", arrayOf("Simple","AfterTick","Vanilla"),"Simple")
     private val interactAutoBlockValue = BoolValue("InteractAutoBlock", true)
     private val autoBlockFacing = BoolValue("AutoBlockFacing",false)
+    private val delayedBlockValue = BoolValue("DelayedBlock", true)
+    private val showTargetValue = BoolValue("ShowTarget", true)
     private val blockRate = IntegerValue("BlockRate", 100, 1, 100)
 
     // Raycast
@@ -162,23 +171,30 @@ class KillAura : Module() {
 
     // Target
     var target: EntityLivingBase? = null
+    private val switchTimer = MSTimer()
+    private var blockTarget : EntityLivingBase? = null
     private var markEntity: EntityLivingBase? = null
     private val markTimer=MSTimer()
     private var currentTarget: EntityLivingBase? = null
     private var hitable = false
     private val prevTargetEntities = mutableListOf<Int>()
+    var noBlock = false
 
     // Attack delay
     private val attackTimer = MSTimer()
     private var attackDelay = 0L
     private var clicks = 0
     private var switchCount = 0
+    private val markTimer = MSTimer()
+    private var markEntity: EntityLivingBase? = null
 
     // Container Delay
     private var containerOpen = -1L
 
     // Fake block status
     var blockingStatus = false
+    private var espAnimation = 0.0
+    private var isUp = true
 
     /**
      * Enable kill aura module
@@ -204,7 +220,64 @@ class KillAura : Module() {
 
         stopBlocking()
     }
+    
+    private fun esp(entity : EntityLivingBase, partialTicks : Float, radius : Float) {
+        GL11.glPushMatrix()
+        GL11.glDisable(3553)
+        GLUtils.startSmooth()
+        GL11.glDisable(2929)
+        GL11.glDepthMask(false)
+        GL11.glLineWidth(1.0F)
+        GL11.glBegin(3)
+        val x: Double = entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * partialTicks - mc.renderManager.viewerPosX
+        val y: Double = entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * partialTicks - mc.renderManager.viewerPosY
+        val z: Double = entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * partialTicks - mc.renderManager.viewerPosZ
+        for (i in 0..360) {
+            val rainbow = Color(Color.HSBtoRGB((mc.thePlayer.ticksExisted / 70.0 + sin(i / 50.0 * 1.75)).toFloat() % 1.0f, 0.7f, 1.0f))
+            GL11.glColor3f(rainbow.red / 255.0f, rainbow.green / 255.0f, rainbow.blue / 255.0f)
+            GL11.glVertex3d(x + radius * cos(i * 6.283185307179586 / 45.0), y + espAnimation, z + radius * sin(i * 6.283185307179586 / 45.0))
+        }
+        GL11.glEnd()
+        GL11.glDepthMask(true)
+        GL11.glEnable(2929)
+        GLUtils.endSmooth()
+        GL11.glEnable(3553)
+        GL11.glPopMatrix()
+    }
 
+    private fun drawESP(entity: EntityLivingBase, color: Int, e: Render3DEvent) {
+        val x: Double =
+            entity.lastTickPosX + (entity.posX - entity.lastTickPosX) * e.partialTicks.toDouble() - mc.renderManager.renderPosX
+        val y: Double =
+            entity.lastTickPosY + (entity.posY - entity.lastTickPosY) * e.partialTicks.toDouble() - mc.renderManager.renderPosY
+        val z: Double =
+            entity.lastTickPosZ + (entity.posZ - entity.lastTickPosZ) * e.partialTicks.toDouble() - mc.renderManager.renderPosZ
+        val radius = 0.15f
+        val side = 4
+        GL11.glPushMatrix()
+        GL11.glTranslated(x, y + 2, z)
+        GL11.glRotatef(-entity.width, 0.0f, 1.0f, 0.0f)
+        RenderUtils.glColor(color)
+        RenderUtils.enableSmoothLine(1.5F)
+        val c = Cylinder()
+        GL11.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f)
+        c.drawStyle = 100012
+        RenderUtils.glColor(Color(80,255,80,200))
+        c.draw(0F, radius, 0.3f, side, 1)
+        c.drawStyle = 100012
+        GL11.glTranslated(0.0, 0.0, 0.3)
+        c.draw(radius, 0f, 0.3f, side, 1)
+        GL11.glRotatef(90.0f, 0.0f, 0.0f, 1.0f)
+        c.drawStyle = 100011
+        GL11.glTranslated(0.0, 0.0, -0.3)
+        RenderUtils.glColor(color)
+        c.draw(0F, radius, 0.3f, side, 1)
+        c.drawStyle = 100011
+        GL11.glTranslated(0.0, 0.0, 0.3)
+        c.draw(radius, 0F, 0.3f, side, 1)
+        RenderUtils.disableSmoothLine()
+        GL11.glPopMatrix()
+    }
     /**
      * Motion event
      */
@@ -434,6 +507,77 @@ class KillAura : Module() {
         }
     }
 
+    target ?: return
+//        val targetList = mutableListOf<EntityLivingBase>()
+//        mc.theWorld.loadedEntityList.forEach {
+//            for(i in prevTargetEntities)
+//                if(it is EntityLivingBase && it.entityId == i)
+//                    targetList.add(it)
+//        }
+
+        if (!targetModeValue.get().equals("Multi", ignoreCase = true)) {
+            when (markModeValue.get()) {
+                "Jello" -> {
+                    renderESP()
+                    drawESP(target!!, Color(80, 255, 80).rgb, event)
+                }
+                "Circle" -> {
+                    if (espAnimation > target!!.eyeHeight + 0.4 || espAnimation < 0) {
+                        isUp = !isUp
+                    }
+                    if (isUp) {
+                        espAnimation += 0.05 * 60 / Minecraft.getDebugFPS()
+                    } else {
+                        espAnimation -= 0.05 * 60 / Minecraft.getDebugFPS()
+                    }
+                    if (isUp) {
+                        esp(target!!, event.partialTicks, circleRadiusValue.get())
+                    } else {
+                        esp(target!!, event.partialTicks, circleRadiusValue.get())
+                    }
+                }
+                "Plat" -> RenderUtils.drawPlatform(
+                    target!!,
+                    if (hitable) Color(37, 126, 255, 70) else Color(255, 0, 0, 70)
+                )
+                "Box" -> {
+                    val renderManager = mc.renderManager
+                    val x = (target!!.lastTickPosX
+                            + (target!!.posX - target!!.lastTickPosX) * mc.timer.renderPartialTicks
+                            - renderManager.renderPosX)
+                    val y = (target!!.lastTickPosY
+                            + (target!!.posY - target!!.lastTickPosY) * mc.timer.renderPartialTicks
+                            - renderManager.renderPosY)
+                    val z = (target!!.lastTickPosZ
+                            + (target!!.posZ - target!!.lastTickPosZ) * mc.timer.renderPartialTicks
+                            - renderManager.renderPosZ)
+                    val width = target!!.entityBoundingBox.maxX - target!!.entityBoundingBox.minX
+                    val height = (target!!.entityBoundingBox.maxY - target!!.entityBoundingBox.minY
+                            + 0.25)
+                    -target!!.entityBoundingBox.minY + 0.25
+                    val red = if (target!!.hurtTime > 0) 1.0f else 0.0f
+                    val green = if (target!!.hurtTime > 0) 0.2f else 1.0f
+                    val blue = if (target!!.hurtTime > 0) 0.0f else 0.0f
+                    val alpha = 0.2f
+                    val lineRed = if (target!!.hurtTime > 0) 1.0f else 0.0f
+                    val lineGreen = if (target!!.hurtTime > 0) 0.2f else 1.0f
+                    val lineBlue = if (target!!.hurtTime > 0) 0.0f else 0.0f
+                    val lineAlpha = 1.0f
+                    val lineWidth = 2.0f
+                    RenderUtils.drawEntityKillAuraESP(
+                        x, y, z, width, height, red, green, blue, alpha, lineRed, lineGreen,
+                        lineBlue, lineAlpha, lineWidth
+                    )
+                }
+            }
+        }
+        if (currentTarget != null && attackTimer.hasTimePassed(attackDelay) &&
+                currentTarget!!.hurtTime <= hurtTimeValue.get()) {
+            clicks++
+            attackTimer.reset()
+        }
+    }
+
     /**
      * Handle entity move
      */
@@ -567,6 +711,13 @@ class KillAura : Module() {
             // Set target to current entity
             target = entity
             return
+           
+            } 
+            
+            // Cleanup last targets when no target found and try again
+        if (prevTargetEntities.isNotEmpty()) {
+            prevTargetEntities.clear()
+            updateTarget()
         }
     }
 
