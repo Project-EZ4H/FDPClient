@@ -146,7 +146,6 @@ class Text(x: Double = 10.0, y: Double = 10.0, scale: Float = 1F,
      */
     override fun drawElement(partialTicks: Float): Border {
         val color = Color(redValue.get(), greenValue.get(), blueValue.get(), alphaValue.get())
-        val addColor = color + Color(0, 0, 0, 50).rgb
 
         val fontRenderer = fontValue.get()
 
