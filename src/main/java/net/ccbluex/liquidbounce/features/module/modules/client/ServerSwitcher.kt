@@ -14,7 +14,7 @@ import net.minecraft.client.gui.GuiMultiplayer
 @ModuleInfo(
         name ="ServerSwitcher",
         description = "Switch the servers.",
-        category = ModuleCategory.WORLD,
+        category = ModuleCategory.CLIENT,
         canEnable = false
 )
 class ServerSwitcher : Module() {
