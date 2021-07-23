@@ -53,9 +53,43 @@ class NameTags : Module() {
         }
     }
 
+    private fun getPlayerName(entity: EntityLivingBase): String {
+        val name = entity.displayName.formattedText
+        var pre = ""
+        val teams = LiquidBounce.moduleManager.getModule(Teams::class.java)
+        if (LiquidBounce.fileManager.friendsConfig.isFriend(entity.name)) {
+            pre = "$pre§b[Friend] "
+        }
+        if (teams.isInYourTeam(entity)) {
+            pre = "$pre§a[TEAM] "
+        }
+        if (AntiBot.isBot(entity)) {
+            pre = "$pre§9[BOT] "
+        }
+        if (!AntiBot.isBot(entity) && !teams.isInYourTeam(entity)) {
+            pre = if (LiquidBounce.fileManager.friendsConfig.isFriend(entity.name)) {
+                "§b[Friend] §c"
+            } else {
+                "§c"
+            }
+        }
+        return name + pre
+       }
+    
     private fun renderNameTag(entity: EntityLivingBase, tag: String) {
         // Set fontrenderer local
         val fontRenderer = fontValue.get()
+
+        // Modify tag
+        val bot = AntiBot.isBot(entity)
+        val nameColor = if (bot) "§3" else if (entity.isInvisible) "§6" else if (entity.isSneaking) "§4" else "§7"
+        val ping = if (entity is EntityPlayer) EntityUtils.getPing(entity) else 0
+
+//        val distanceText = if (distanceValue.get()) " §7${mc.thePlayer.getDistanceToEntity(entity).roundToInt()}m " else ""
+        val pingText = if (pingValue.get() && entity is EntityPlayer) (if (ping > 200) " §c" else if (ping > 100) "§e" else "§a") + ping + "ms §7" else ""
+        val healthText = if (healthValue.get()) "Health: " + entity.health.toInt() else ""
+        val botText = if (bot) "§9§l[Bot]" else ""
+        val text = "$botText$nameColor$tag"
 
         // Push
         glPushMatrix()
